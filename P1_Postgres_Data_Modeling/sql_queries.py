@@ -12,13 +12,14 @@ songplay_table_create = ("""
     CREATE TABLE IF NOT EXISTS songplays (
         songplay_id INTEGER ,
         start_time TIMESTAMP NOT NULL,
-        user_id INTEGER NOT NULL REFERENCES users (user_id),
+        user_id INTEGER NOT NULL,
         level VARCHAR,
-        song_id VARCHAR REFERENCES songs (song_id),
-        artist_id VARCHAR REFERENCES artists (artist_id),
+        song_id VARCHAR,
+        artist_id VARCHAR,
         session_id INTEGER NOT NULL,
         location VARCHAR,
         user_agent VARCHAR
+    )
 """)
 
 user_table_create = ("""
@@ -35,7 +36,7 @@ song_table_create = ("""
     CREATE TABLE IF NOT EXISTS songs (
         song_id VARCHAR PRIMARY KEY,
         title VARCHAR NOT NULL,
-        artist_id VARCHAR NOT NULL REFERENCES artists (artist_id),
+        artist_id VARCHAR NOT NULL,
         year INTEGER NOT NULL,
         duration NUMERIC (15, 5) NOT NULL
     )
@@ -153,5 +154,5 @@ song_select = ("""
 
 # QUERY LISTS
 
-create_table_queries = [songplay_table_create, user_table_create, song_table_create, artist_table_create, time_table_create]
+create_table_queries = [user_table_create, artist_table_create, song_table_create, songplay_table_create, time_table_create]
 drop_table_queries = [songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]
