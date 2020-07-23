@@ -7,13 +7,11 @@ def start_test(cur, conn):
     """
     Get the number of records in each table
     """
-    for query in [test_staging_events,test_staging_songs,test_songplays,test_users,test_songs,test_artists,test_time]:
-        print('Running the query: {}'.format(query))
+    for query in test_queries:
         cur.execute(query)
         results = cur.fetchone()
-
         for row in results:
-            print("   ", row)
+            print('{} retuns {} records'.format(query,row))
 
 def main():
     """

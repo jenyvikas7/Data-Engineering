@@ -93,7 +93,7 @@ def main():
     with open('dwh.cfg', 'w+') as configfile:
         config.write(configfile)
     print('Successfully updated DWH Endpoint in dwh.cfg file')
-    open_ports(ec2, myClusterProps, DWH_PORT)
+    #open_ports(ec2, myClusterProps, DWH_PORT)
     conn = psycopg2.connect("host={} dbname={} user={} password={} port={}".format(*config['CLUSTER'].values()))
     cur = conn.cursor()
     print('Connected')
