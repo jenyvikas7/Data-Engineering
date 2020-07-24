@@ -7,11 +7,16 @@ In order to enable Sparkify to parse and analyze their data in a distributed man
 
 To start the ETL pipeline, you have to run the following file below:
 
-%run etl.py
+- **%run etl.py**
 
 # Files in the repository
 
 * **etl.py**: Python script to extract the needed information from Song and Log data inside the S3 buckets and parsing/inserting them to the local directory
+* **dl.cfg**: Config file to store AWS/Configuration related information
+* **testing.ipynb**: Jupyter notebook to test the ETL process
+* **README**: File with project information
+* **data**: Input data used to test the Spark ETL
+* **results**: Output data from the Spark ETL
 
 
 # The database schema design and ETL pipeline.
@@ -20,8 +25,48 @@ In order to enable Sparkify to analyze their data, a Relational Database Schema 
 The so-called star scheme enables the company to view the user behaviour over several dimensions.
 The fact table is used to store all user song activities that contain the category "NextSong". Using this table, the company can relate and analyze the dimensions users, songs, artists and time.
 
-* **Fact Table**: songplays
-* **Dimension Tables**: users, songs, artists and time.
+# Dimension Tables and Fact Table
+
+**songplays** - Fact table - records in log data associated with song plays
+- songplay_id (INT) PRIMARY KEY: ID of each song play 
+- start_time (DATE) NOT NULL: Timestamp of beggining of user activity
+- userId (INT) NOT NULL: ID of user
+- level (TEXT): User level {free | paid}
+- song_id (TEXT) NOT NULL: ID of Song played
+- artist_id (TEXT) NOT NULL: ID of Artist
+- sessionId (INT): ID of the session
+- location (TEXT): User location 
+- userAgent (TEXT): Agent used by user to access Sparkify platform
+
+**users** - users in the app
+- userId (INT) PRIMARY KEY: ID of user
+- first_name (TEXT) NOT NULL: Name of user
+- last_name (TEXT) NOT NULL: Last Name of user
+- gender (TEXT): Gender of user {M | F}
+- level (TEXT): User level {free | paid}
+
+**songs** - songs in music database
+- song_id (TEXT) PRIMARY KEY: ID of Song
+- title (TEXT) NOT NULL: Title of Song
+- artist_id (TEXT) NOT NULL: ID of Artist
+- artist_name (TEXT): Name of artist
+- year (INT): Year of song release
+- duration (FLOAT) NOT NULL: Song duration in ms
+
+**artists** - artists in music database
+- artist_id (TEXT) PRIMARY KEY: ID of Artist
+- artist_name (TEXT) NOT NULL: Name of Artist
+- artist_location (TEXT): Name of Artist city
+- artist_lattitude (FLOAT): Lattitude location of artist
+- artist_longitude (FLOAT): Longitude location of artist
+
+**time** - different dimensions of time
+- start_time (DATE) PRIMARY KEY: Timestamp of record
+- hour (INT): Hour associated to start_time
+- day (INT): Day associated to start_time
+- month (INT): Month associated to start_time 
+- year (INT): Year associated to start_time
+
 
 # Dataset used
 

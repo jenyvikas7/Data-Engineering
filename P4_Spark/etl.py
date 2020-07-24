@@ -6,6 +6,9 @@ from pyspark.sql.functions import udf, col, monotonically_increasing_id
 from pyspark.sql.functions import year, month, dayofmonth, hour, weekofyear, date_format
 
 def create_spark_session():
+    """
+    Creates a new or gets the existing Spark session
+    """
     spark = SparkSession \
     .builder \
     .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:2.7.0") \
@@ -14,6 +17,15 @@ def create_spark_session():
 
 
 def process_song_data(spark, input_data, output_data):
+    """ Processes the song data files
+    
+    Arguments:
+        spark{SparkSession} : Spark session
+        input_data{str}     : path for input files
+        output_data{str}    : path for output files
+    
+    """
+    
     print('Getting filepath to song data file')
     song_data = os.path.join(input_data,'song_data/*/*/*/*.json')
     print('Got filepath to song data file: {}'.format(song_data))
@@ -38,6 +50,14 @@ def process_song_data(spark, input_data, output_data):
     print('Successfully wrote artists table to parquet files')
     
 def process_log_data(spark, input_data, output_data):
+    """ Processes the log data files
+    
+    Arguments:
+        spark{SparkSession} : Spark session
+        input_data{str}     : path for input files
+        output_data{str}    : path for output files
+        
+    """
     # get filepath to log data file
     print('Getting filepath to log data file')
     log_data = os.path.join(input_data,'log_data/*.json')
@@ -58,7 +78,8 @@ def process_log_data(spark, input_data, output_data):
     # extract columns for users table    
     print('Extracting columns for users table')
     users_table = df.select(['userId', 'firstName', 'lastName', 'gender', 'level','ts'])
-    #users_table = users_table.orderBy('ts',ascending=False).dropDuplicates(subset=['userId'])
+    #Removing the duplicates as per review comments
+    users_table = users_table.orderBy('ts',ascending=False).dropDuplicates(subset=['userId'])
     users_table.show(2)
     print('Successfully extracted columns for users table')
     
@@ -67,9 +88,6 @@ def process_log_data(spark, input_data, output_data):
     users_table.write.parquet(os.path.join(output_data,'users.parquet'),'overwrite')
     print('Successfully wrote users table to parquet files')
 
-    # create timestamp column from original timestamp column
-    #get_timestamp = udf()
-    #df = 
     
     # create datetime column from original timestamp column
     print('Creating datetime column from original timestamp column')
@@ -113,9 +131,10 @@ def process_log_data(spark, input_data, output_data):
     print('Extracted columns from joined song and log datasets to create songplays table ')
 
     # 
-    print('Write songplays table to parquet files partitioned by year and month')
-    songplays_table.write.parquet(os.path.join(output_data, 'songplays.parquet'), 'overwrite')
-    print('Successfully wrote songplays table to parquet files partitioned by year and month')
+    print('Write songplays table to parquet files partitioned by artist id')
+    #Adding partition while writing the tables to parquet files
+    songplays_table.write.partitionBy('artist_id').parquet(os.path.join(output_data, 'songplays.parquet'), 'overwrite')
+    print('Successfully wrote songplays table to parquet files partitioned by artist id')
 
 def main():
     spark = create_spark_session()
