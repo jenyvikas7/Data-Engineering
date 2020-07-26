@@ -35,12 +35,10 @@ Port: Enter 5439.
 * dags/sparkify_dag.py: Directed Acyclic Graph definition with imports, tasks and task dependencies
 * plugins/helpers/sql_queries.py: Contains Insert SQL statements
 * plugins/operators/create_tables.sql: Contains SQL Table creations statements
-* plugins/operators/create_tables.py: CreateTablesOperator that create all required tables
 * plugins/operators/stage_redshift.py: StageToRedshiftOperator that copies data from S3 buckets into redshift staging tables
 * plugins/operators/load_dimension.py: LoadDimensionOperator that loads data from redshift staging tables into dimensional tables
 * plugins/operators/load_fact.py: LoadFactOperator that loads data from redshift staging tables into fact table
 * plugins/operators/data_quality.py: DataQualityOperator that validates data quality in redshift tables
-* plugins/operators/createtables.sql: File with sql queries to create all required tables
 
 
 ### Sparkify DAG
@@ -84,8 +82,6 @@ Dimension loads are done with the truncate-insert pattern where the target table
 
 #### Data Quality Operator
 The data quality operator is used to run checks on the data itself. The operator's main functionality is to check the quality of data by running SQL test cases along with the expected results. For each the test, the test result and expected result are checked and if there is a mismatch, the operator raises an exception.
-
-For example one test could be a SQL statement that checks if certain column contains NULL values by counting all the rows that have NULL in the column. We do not want to have any NULLs so expected result would be 0 and the test would compare the SQL statement's outcome to the expected result.
 
 
 ### Airflow UI views of DAG and plugins

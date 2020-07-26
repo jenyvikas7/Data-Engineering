@@ -4,14 +4,13 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators import (StageToRedshiftOperator, LoadFactOperator,
                                 LoadDimensionOperator, DataQualityOperator)
-from airflow.operators import CreateTablesOperator
 from helpers import SqlQueries
 
 
 
 default_args = {
     'owner': 'udacity',
-    'start_date': datetime(2020, 7, 25),
+    'start_date': datetime(2020, 7, 26),
     'depends_on_past': False,
     'retries': 3,
     'retry_delay': timedelta(seconds=300),
@@ -26,11 +25,6 @@ dag = DAG('sparkify_dag',
 
 start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
 
-create_redshift_tables = CreateTablesOperator(
-    task_id='Create_tables',
-    dag=dag,
-    redshift_conn_id="redshift"
-)
 
 stage_events_to_redshift = StageToRedshiftOperator(
     task_id='Stage_events',
@@ -108,22 +102,20 @@ run_quality_checks = DataQualityOperator(
         "artists",
         "time"
     ],
+    dq_checks=[
+            {'check_sql':'SELECT COUNT(*) FROM songplays' , 'expected_result': 47740},
+            {'check_sql':'SELECT COUNT(*) FROM users' , 'expected_result': 104},
+            {'check_sql':'SELECT COUNT(*) FROM songs' , 'expected_result': 14896},
+            {'check_sql':'SELECT COUNT(*) FROM artists' , 'expected_result': 10025},
+            {'check_sql':'SELECT COUNT(*) FROM time' , 'expected_result': 47740}
+]
 )
 
 end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
 
 # Setting up the dependencies and order
-start_operator >> create_redshift_tables
-create_redshift_tables >> stage_events_to_redshift
-create_redshift_tables >> stage_songs_to_redshift
-stage_events_to_redshift >> load_songplays_table
-stage_songs_to_redshift >> load_songplays_table
-load_songplays_table >> load_song_dimension_table
-load_songplays_table >> load_user_dimension_table
-load_songplays_table >> load_artist_dimension_table
-load_songplays_table >> load_time_dimension_table
-load_song_dimension_table >> run_quality_checks
-load_user_dimension_table >> run_quality_checks
-load_artist_dimension_table >> run_quality_checks
-load_time_dimension_table >> run_quality_checks
+start_operator >> [stage_events_to_redshift,stage_songs_to_redshift]
+[stage_events_to_redshift,stage_songs_to_redshift] >> load_songplays_table
+load_songplays_table >> [load_song_dimension_table,load_user_dimension_table,load_artist_dimension_table,load_time_dimension_table]
+[load_song_dimension_table,load_user_dimension_table,load_artist_dimension_table,load_time_dimension_table] >> run_quality_checks
 run_quality_checks >> end_operator
