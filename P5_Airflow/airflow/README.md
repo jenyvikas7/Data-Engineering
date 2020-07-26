@@ -64,7 +64,7 @@ DAG contains default_args dict bind to the DAG, with the following keys:
 
 * Task dependencies are set as following:
 
-![DAG Flow](imgs/airflow-pipeline.PNG)
+![DAG Flow](images/airflow-pipeline.PNG)
 
 ### Operators
 Operators create necessary tables, stage the data, transform the data, and run checks on data quality.
